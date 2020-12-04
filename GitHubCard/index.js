@@ -1,8 +1,22 @@
+import axios from 'axios';
 /*
   STEP 1: using axios, send a GET request to the following URL
     (replacing the placeholder with your Github name):
     https://api.github.com/users/<your name>
 */
+axios
+  .get('https://api.github.com/users/bigknell')
+  .then((response)=>{
+    const user = response.data;
+
+    const myCard = gitCardMaker(user);
+
+    document.querySelector('.cards').appendChild(myCard);
+  })
+  .catch((error)=>{
+    error = "Error! Couldn't get data from the api"
+    console.log(error);
+  })
 
 /*
   STEP 2: Inspect and study the data coming back, this is YOUR
@@ -27,8 +41,27 @@
     Using that array, iterate over it, requesting data for each user, creating a new card for each
     user, and adding that card to the DOM.
 */
+axios 
+.get('https://api.github.com/users/bigknell/followers')
+.then((response)=>{
+  const followerAPI = response.data;
+  const followersArray = followerAPI;
+  followersArray.forEach((item)=>{
+    const followerCard = gitCardMaker(item)
+    document.querySelector('.cards').appendChild(followerCard);
+  })
 
-const followersArray = [];
+})
+.catch((error)=>{
+  error = "Error couldn't get follwers from api"
+  console.log(error);
+})
+
+
+
+// followersArray.forEach()
+
+
 
 /*
   STEP 3: Create a function that accepts a single object as its only argument.
@@ -49,6 +82,61 @@ const followersArray = [];
       </div>
     </div>
 */
+
+function gitCardMaker({avatar_url,name, login,location,html_url,followers,following,bio}){
+
+  // instantiating the elements
+  const card = document.createElement('div'); //parent div
+  const image = document.createElement('img'); //card image
+  const cardInfo = document.createElement('div'); //elements under this will be nested in cardInfo.
+  const realName = document.createElement('h3'); // the users actual name
+  const userName = document.createElement('p'); // the users user name
+  const userLocation = document.createElement('p'); //the users location
+  const profile = document.createElement('p'); //profile will have an a tag nested witin it. cardInfo -> profile -> link
+  const profileLink = document.createElement('a'); //link to user gitHub
+  const userFollowers = document.createElement('p'); //users follower count
+  const userFollowing =  document.createElement('p'); //users follwing count
+  const userBio = document.createElement('p'); //users bio
+
+  // creating the hierarchy
+  card.appendChild(image);
+  card.appendChild(cardInfo);
+
+  cardInfo.appendChild(realName);
+  cardInfo.appendChild(userName);
+  cardInfo.appendChild(userLocation);
+  cardInfo.appendChild(profile);  
+  // profile.appendChild(profileLink); //linked nsted within profile
+
+  cardInfo.appendChild(userFollowers);
+  cardInfo.appendChild(userFollowing);
+  cardInfo.appendChild(userBio);
+
+
+  // setting class names
+  card.classList.add('card');
+  cardInfo.classList.add('card-info');
+  realName.classList.add('name');
+  userName.classList.add('username');
+
+  // setting attributes
+  image.src = avatar_url;
+  profileLink.href = html_url;
+
+
+  // setting text
+  realName.textContent = name;
+  userName.textContent = login;
+  userLocation.textContent = `Location: ${location}`;
+  profile.textContent = 'Profile: ' + profileLink
+  profileLink.textContent = html_url;
+  userFollowers.textContent = `Followers: ${followers}`;
+  userFollowing.textContent = `Following: ${following}`;
+  userBio.textContent = `Bio: ${bio}`;
+
+  return card;
+}
+
 
 /*
   List of LS Instructors Github username's:
